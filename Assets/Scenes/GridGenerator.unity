@@ -416,7 +416,7 @@ MonoBehaviour:
   _gridYValue: 64
   _cellSize: 1
   _startPosition: {x: 0, y: 0, z: 0}
-  _generationMethod: {fileID: 11400000, guid: eaa2ec281d2ae6d4ea6e3bcbb75a3d91, type: 2}
+  _generationMethod: {fileID: 11400000, guid: 77f218ec25a05b04bac9e7dc209bcefc, type: 2}
   _drawDebug: 0
   _seed: 1234
   _stepDelay: 500

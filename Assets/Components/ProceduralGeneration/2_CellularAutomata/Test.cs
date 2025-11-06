@@ -19,10 +19,11 @@ public class Test : ProceduralGenerationMethod
 
     protected override async UniTask ApplyGeneration(CancellationToken cancellationToken)
     {
-        var time = System.DateTime.Now;
+        
         int width = Grid.Width;
         int length = Grid.Lenght;
         CellA[,] gridA = new CellA[width, length];
+        var time = System.DateTime.Now;
 
         // Générer l'eau et la terre avec le bruit
         for (int y = 0; y < Grid.Lenght; y++)
@@ -42,6 +43,8 @@ public class Test : ProceduralGenerationMethod
         Debug.Log("Initial noise generated in " + (System.DateTime.Now - time).TotalSeconds + " seconds.");
 
         await UniTask.Delay(GridGenerator.StepDelay, cancellationToken: cancellationToken);
+
+        time = System.DateTime.Now;
 
         // Initialiser les voisins
         for (int y = 0; y < Grid.Lenght; y++)
@@ -80,6 +83,8 @@ public class Test : ProceduralGenerationMethod
             bool[,] nextState = new bool[width, length];
             bool anyChange = false;
 
+            time = System.DateTime.Now;
+
             // Faire un scan sur la grid
             for (int y = 0; y < Grid.Lenght; y++)
             {
@@ -88,6 +93,10 @@ public class Test : ProceduralGenerationMethod
                     nextState[x, y] = gridA[x, y].Scan();
                 }
             }
+
+            Debug.Log("Scan " + i + " done in " + (System.DateTime.Now - time).TotalSeconds + " seconds.");
+
+            time = System.DateTime.Now;
 
             // Ajouter les tiles qui ont changé
             for (int y = 0; y < Grid.Lenght; y++)
@@ -108,6 +117,7 @@ public class Test : ProceduralGenerationMethod
 
                 }
             }
+            Debug.Log("Update " + i + " done in " + (System.DateTime.Now - time).TotalSeconds + " seconds.");
 
             if (!anyChange || i >= iterationCount)
             {
