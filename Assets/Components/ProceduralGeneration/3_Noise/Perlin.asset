@@ -14,12 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Algo
   _maxSteps: 10
   noiseType: 0
-  frequency: 0.0186
+  frequency: 0.0191
   amplitude: 1
-  fractalType: 0
+  fractalType: 1
   octaves: 2
   lacunarity: 2.77
-  persistence: 0.5
+  persistence: 0.005
   waterHeight: -0.39
   sandHeight: -0.03
   grassHeight: 0.53

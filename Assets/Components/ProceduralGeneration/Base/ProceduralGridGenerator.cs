@@ -11,7 +11,7 @@ namespace Components.ProceduralGeneration
         [SerializeField] private ProceduralGenerationMethod _generationMethod;
         [SerializeField] private bool _drawDebug;
         [SerializeField] private int _seed = 1234;
-        [SerializeField, Range(1,2000), Tooltip("Delay between each steps in milliseconds")] private int _stepDelay = 500;
+        [SerializeField, Range(1,2000), Tooltip("Delay between each steps in milliseconds")] private int _stepDelay = 200;
 
         public int StepDelay => _stepDelay;
         

@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.Collections.Generic;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using VTools.Grid;
@@ -12,17 +13,16 @@ namespace Components.ProceduralGeneration.SimpleRoomPlacement
         [Header("Room Parameters")]
         [SerializeField] private int _maxRooms = 10;
         [SerializeField] int minSizeRoom = 3;
-        [SerializeField] int maxSizeRoom = 6;
+        [SerializeField] int maxSizeRoom = 10;
+        [SerializeField] int spacingBetweenRoom = 5;
 
         protected override async UniTask ApplyGeneration(CancellationToken cancellationToken)
         {
             // Declare variables here
             int roomsCreated = 0;
-            int spacingMin = 1;
-            int spacingMax = 3;
-            RectInt[] listRooms = new RectInt[_maxRooms];
+            List<RectInt> listRooms = new List<RectInt>(_maxRooms);
             int currentRoom = 0;
-            int currentRoomCount = 0;
+            int connectedRooms = 0;
 
 
 
@@ -40,43 +40,66 @@ namespace Components.ProceduralGeneration.SimpleRoomPlacement
                     int lengthRoom = RandomService.Range(minSizeRoom, maxSizeRoom);
                     int xRoom = RandomService.Range(0, Grid.Width);
                     int yRoom = RandomService.Range(0, Grid.Lenght);
-                    int spacing = RandomService.Range(spacingMin, spacingMin);
 
                     RectInt room = new RectInt(xRoom, yRoom, widthRoom, lengthRoom);
 
-                    if(CanPlaceRoom(room, spacing))
+                    if(CanPlaceRoom(room, spacingBetweenRoom))
                     {
                         PlaceRoom(room, ROOM_TILE_NAME);
+                        listRooms.Add(room);
                         roomsCreated++;
                     }
 
                 }
                 else // ajouter une route
                 {
-                    // On check si toute les rooms sont reliées
-                    if (currentRoomCount >= _maxRooms) break;
+                    if(listRooms.Count == 1)
+                        break; // Toutes les rooms sont reliées
 
-                    // Chercher la room la plus proche de la current room
+                    // On cherche la premiere room la plus proche de l'origine si c'est la première connexion
+                    if (connectedRooms == 0)
+                    {
+                        Vector2 origin = new Vector2(0, 0);
+                        float minDistance = float.MaxValue;
 
-                    int distance = 0;
+                        for (int r = 0; r < listRooms.Count; r++)
+                        {
+                            float dist = Vector2.Distance(origin, listRooms[r].center);
+                            if (dist < minDistance)
+                            {
+                                currentRoom = r;
+                                minDistance = dist;
+                            }
+                        }
+                    }
 
-                    //for(int k = 0; k < listRooms.Length; k++)
-                    //{
-                    //    int tempDistance = Mathf.Sqrt(Mathf.Pow((float)(listRooms[k].x - listRooms[currentRoom].x), 2) + Mathf.Pow(listRooms[k].x - listRooms[currentRoom].x, 2));
-                    //    if (distance < Mathf.Abs(listRooms[k].center - listRooms[currentRoom].center))
-                    //}
+                    // On cherche la room la plus proche de la room courante dans la liste
+                    RectInt roomA = listRooms[currentRoom];
+                    float minDistanceB = float.MaxValue;
+                    int closestRoomIndex = -1;
+                    for (int r = 0; r < listRooms.Count; r++)
+                    {
+                        if (r == currentRoom)
+                            continue;
+                        float dist = Vector2.Distance(roomA.center, listRooms[r].center);
+                        if (dist < minDistanceB)
+                        {
+                            closestRoomIndex = r;
+                            minDistanceB = dist;
+                        }
+                    }
+
+                    RectInt roomB = listRooms[closestRoomIndex];
+
+                    // On crée le couloir entre les deux rooms
+                    CreateCorridor(roomA.center, roomB.center);
+
+                    // On supprime la room A de la liste pour ne pas la reconnecter
+                    listRooms.RemoveAt(currentRoom);
+                    currentRoom = closestRoomIndex > currentRoom ? closestRoomIndex - 1 : closestRoomIndex;
+                    connectedRooms++;
 
                 }
-
-
-
-
-
-                // Si le nombre de room est atteint on fait juste des couloirs
-                // COULOIR
-                // 
-
-                // ajouter un couloir
 
 
 
@@ -87,7 +110,40 @@ namespace Components.ProceduralGeneration.SimpleRoomPlacement
             // Final ground building.
             BuildGround();
         }
-        
+
+        // ------------------------------------------------------------
+        // COULOIR : création d’un chemin entre deux points
+        // ------------------------------------------------------------
+        private void CreateCorridor(Vector2 a, Vector2 b)
+        {
+            int x1 = Mathf.RoundToInt(a.x);
+            int y1 = Mathf.RoundToInt(a.y);
+            int x2 = Mathf.RoundToInt(b.x);
+            int y2 = Mathf.RoundToInt(b.y);
+
+            // 1. Mouvement horizontal
+            int stepX = x1 < x2 ? 1 : -1;
+            for (int x = x1; x != x2; x += stepX)
+            {
+                TryPlaceTile(x, y1);
+            }
+
+            // 2. Mouvement vertical
+            int stepY = y1 < y2 ? 1 : -1;
+            for (int y = y1; y != y2; y += stepY)
+            {
+                TryPlaceTile(x2, y);
+            }
+        }
+
+        private void TryPlaceTile(int x, int y)
+        {
+            if (Grid.TryGetCellByCoordinates(x, y, out var cell))
+            {
+                AddTileToCell(cell, CORRIDOR_TILE_NAME, true);
+            }
+        }
+
         private void BuildGround()
         {
             var groundTemplate = ScriptableObjectDatabase.GetScriptableObject<GridObjectTemplate>("Grass");

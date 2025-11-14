@@ -63,7 +63,7 @@ public class Algo : ProceduralGenerationMethod
                     }
                     else if (noiseMap[x, y] < sandHeight)
                     {
-                        AddTileToCell(cell, SAND_TILE_NAME, false);
+                        AddTileToCell(cell, SAND_3D_TILE_NAME, false);
                     }
                     else if (noiseMap[x, y] < grassHeight)
                     {
