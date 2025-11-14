@@ -26,6 +26,7 @@ namespace Components.ProceduralGeneration
         protected const string WATER_TILE_NAME = "Water";
         protected const string ROCK_TILE_NAME = "Rock";
         protected const string SAND_TILE_NAME = "Sand";
+        protected const string SAND_3D_TILE_NAME = "Sand3D";
 
         // -------------------------------------- BASE ----------------------------------------------------
         
