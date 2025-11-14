@@ -9,7 +9,7 @@ using UnityEngine.UIElements;
 using VTools.Grid;
 
 [CreateAssetMenu(menuName = "Procedural Generation Method/Cellular")]
-public class Test : ProceduralGenerationMethod
+public class CellularAutomata : ProceduralGenerationMethod
 {
 
     [Header("Test Parameters")]

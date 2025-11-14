@@ -5,7 +5,7 @@ using UnityEngine;
 
 
 [CreateAssetMenu(menuName = "Procedural Generation Method/Noise")]
-public class Algo : ProceduralGenerationMethod
+public class Noise : ProceduralGenerationMethod
 {
     [Header("Noise Parameters")]
     [SerializeField] private FastNoiseLite.NoiseType noiseType = FastNoiseLite.NoiseType.Perlin;
@@ -63,7 +63,7 @@ public class Algo : ProceduralGenerationMethod
                     }
                     else if (noiseMap[x, y] < sandHeight)
                     {
-                        AddTileToCell(cell, SAND_3D_TILE_NAME, false);
+                        AddTileToCell(cell, SAND_TILE_NAME, false);
                     }
                     else if (noiseMap[x, y] < grassHeight)
                     {
